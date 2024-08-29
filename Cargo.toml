@@ -1,0 +1,11 @@
+[package]
+name = "iced_font_awesome"
+authors = ["Daniel M. Bomfim"]
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+iced = { version = "0.12.1", features = ["advanced"] }
