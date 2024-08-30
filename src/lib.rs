@@ -1,4 +1,3 @@
-
 use iced::advanced::layout::{self, Layout};
 use iced::advanced::widget::{self, Widget};
 use iced::advanced::{renderer, Text};
@@ -7,18 +6,25 @@ use iced::{color, Pixels};
 use iced::{mouse, Point};
 use iced::{Color, Element, Length, Rectangle, Size};
 
+const REGULAR_FONT: &[u8] =
+    include_bytes!("../assets/font-awesome/otfs/font-awesome-6-free-regular-400.otf");
+
 pub struct FaIcon {
-    name: String,
+    code: char,
     size: f32,
     color: Color,
 }
 
 impl FaIcon {
-    pub fn new(name: &str, size: f32) -> Self {
+    pub fn new(_name: &str, size: f32) -> Self {
+        let code_point = u32::from_str_radix("f3a3", 16).unwrap_or('\u{f005}' as u32);
+
+        let code = char::from_u32(code_point).unwrap();
+
         Self {
-            name: name.to_owned(),
+            code,
             size,
-            color: color!(0, 0, 0),
+            color: color!(255, 0, 0),
         }
     }
 }
@@ -57,17 +63,21 @@ where
         _cursor: mouse::Cursor,
         viewport: &Rectangle,
     ) {
+        renderer.load_font(REGULAR_FONT.into());
+
+        let text = Text {
+            content: &self.code.to_string(),
+            bounds: layout.bounds().size(),
+            horizontal_alignment: iced::alignment::Horizontal::Center,
+            vertical_alignment: iced::alignment::Vertical::Center,
+            line_height: LineHeight::Relative(self.size),
+            shaping: Shaping::Basic,
+            size: Pixels::from(self.size),
+            font: renderer.default_font(),
+        };
+
         renderer.fill_text(
-            Text {
-                content: "F",
-                bounds: layout.bounds().size(),
-                horizontal_alignment: iced::alignment::Horizontal::Center,
-                vertical_alignment: iced::alignment::Vertical::Center,
-                line_height: LineHeight::Relative(self.size),
-                shaping: Shaping::Basic,
-                size: Pixels::from(self.size),
-                font: renderer.default_font(),
-            },
+            text,
             Point::new(layout.bounds().center_x(), layout.bounds().center_y()),
             self.color,
             *viewport,
