@@ -1,4 +1,7 @@
 use std::borrow::Cow;
+use std::collections::HashMap;
+use std::fs::File;
+use std::io::BufReader;
 use std::sync::Once;
 
 use iced::advanced::layout::{self, Layout};
@@ -8,6 +11,8 @@ use iced::widget::text::{LineHeight, Shaping};
 use iced::{color, Font, Pixels};
 use iced::{mouse, Point};
 use iced::{Color, Element, Length, Rectangle, Size};
+use serde::Deserialize;
+use serde_json::Deserializer;
 
 const REGULAR_FONT: &[u8] =
     include_bytes!("../assets/font-awesome/otfs/font-awesome-6-free-regular-400.otf");
@@ -45,8 +50,9 @@ pub struct FaIcon {
 }
 
 impl FaIcon {
-    pub fn new(_name: &str, size: f32, font: IconFont) -> Self {
-        let code_point = u32::from_str_radix("f3a3", 16).unwrap_or('\u{f005}' as u32);
+    pub fn new(name: &str, size: f32, font: IconFont) -> Self {
+        let code = get_icon_unicode(name, &font).unwrap_or("3f".to_owned());
+        let code_point = u32::from_str_radix(&code, 16).unwrap();
 
         let code = char::from_u32(code_point).unwrap();
 
@@ -136,4 +142,39 @@ where
     fn from(icon: FaIcon) -> Self {
         Self::new(icon)
     }
+}
+
+#[derive(Deserialize, Clone)]
+struct IconData {
+    unicode: String,
+    styles: Vec<String>,
+}
+
+fn get_icon_unicode(label: &str, font: &IconFont) -> Option<String> {
+    let file = File::open("assets/font-awesome/icons.json").ok()?;
+    let reader = BufReader::new(file);
+
+    let stream = Deserializer::from_reader(reader).into_iter::<HashMap<String, IconData>>();
+
+    let style = match font {
+        IconFont::Brands => "brands".to_owned(),
+        IconFont::Default => "regular".to_owned(),
+        IconFont::Solid => "solid".to_owned(),
+    };
+
+    for item in stream {
+        let value = item.ok()?;
+
+        if value.contains_key(label) {
+            let data = value.get(label)?;
+
+            if !data.styles.contains(&style) {
+                return None;
+            }
+
+            return Some(data.unicode.clone());
+        }
+    }
+
+    None
 }
