@@ -83,8 +83,14 @@ impl FaIcon {
             code,
             size,
             font,
-            color: color!(255, 0, 0),
+            color: color!(0, 0, 0),
         }
+    }
+
+    pub fn color(mut self, color: Color) -> Self {
+        self.color = color;
+
+        self
     }
 }
 
