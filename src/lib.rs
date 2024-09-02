@@ -7,6 +7,7 @@ use std::sync::Once;
 use iced::advanced::layout::{self, Layout};
 use iced::advanced::widget::{self, Widget};
 use iced::advanced::{renderer, Text};
+use iced::font::Family;
 use iced::widget::text::{LineHeight, Shaping};
 use iced::{color, Font, Pixels};
 use iced::{mouse, Point};
@@ -14,14 +15,30 @@ use iced::{Color, Element, Length, Rectangle, Size};
 use serde::Deserialize;
 use serde_json::Deserializer;
 
-const REGULAR_FONT: &[u8] =
+const REGULAR_FONT_DATA: &[u8] =
     include_bytes!("../assets/font-awesome/otfs/font-awesome-6-free-regular-400.otf");
 
-const BRANDS_FONT: &[u8] =
+const BRANDS_FONT_DATA: &[u8] =
     include_bytes!("../assets/font-awesome/otfs/font-awesome-6-brands-regular-400.otf");
 
-const SOLID_FONT: &[u8] =
+const SOLID_FONT_DATA: &[u8] =
     include_bytes!("../assets/font-awesome/otfs/font-awesome-6-free-solid-900.otf");
+
+const REGULAR_FONT: Font = Font {
+    family: Family::Name("Font Awesome 6 Free"),
+    ..Font::DEFAULT
+};
+
+const SOLID_FONT: Font = Font {
+    family: Family::Name("Font Awesome 6 Free"),
+    weight: iced::font::Weight::Black,
+    ..Font::DEFAULT
+};
+
+const BRANDS_FONT: Font = Font {
+    family: Family::Name("Font Awesome 6 Brands"),
+    ..Font::DEFAULT
+};
 
 static INIT: Once = Once::new();
 
@@ -30,9 +47,9 @@ where
     T: iced::advanced::text::Renderer,
 {
     INIT.call_once(|| {
-        renderer.load_font(Cow::from(REGULAR_FONT));
-        renderer.load_font(Cow::from(BRANDS_FONT));
-        renderer.load_font(Cow::from(SOLID_FONT));
+        renderer.load_font(Cow::from(REGULAR_FONT_DATA));
+        renderer.load_font(Cow::from(BRANDS_FONT_DATA));
+        renderer.load_font(Cow::from(SOLID_FONT_DATA));
     });
 }
 
@@ -57,9 +74,9 @@ impl FaIcon {
         let code = char::from_u32(code_point).unwrap();
 
         let font = match font {
-            IconFont::Brands => Font::with_name("Font Awesome 6 Brands"),
-            IconFont::Default => Font::with_name("Font Awesome 6 Free"),
-            IconFont::Solid => Font::with_name("Font Awesome 6 Free"),
+            IconFont::Brands => BRANDS_FONT,
+            IconFont::Default => REGULAR_FONT,
+            IconFont::Solid => SOLID_FONT,
         };
 
         Self {
