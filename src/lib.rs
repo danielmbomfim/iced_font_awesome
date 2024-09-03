@@ -1,8 +1,5 @@
 use std::borrow::Cow;
-use std::collections::HashMap;
-use std::fs::File;
-use std::io::BufReader;
-use std::sync::Once;
+use std::sync::{Mutex, Once};
 
 use iced::advanced::layout::{self, Layout};
 use iced::advanced::widget::{self, Widget};
@@ -13,7 +10,6 @@ use iced::{color, Font, Pixels};
 use iced::{mouse, Point};
 use iced::{Color, Element, Length, Rectangle, Size};
 use serde::Deserialize;
-use serde_json::Deserializer;
 
 const REGULAR_FONT_DATA: &[u8] =
     include_bytes!("../assets/font-awesome/otfs/font-awesome-6-free-regular-400.otf");
@@ -169,15 +165,31 @@ where
 
 #[derive(Deserialize, Clone)]
 struct IconData {
+    label: String,
     unicode: String,
     styles: Vec<String>,
 }
 
-fn get_icon_unicode(label: &str, font: &IconFont) -> Option<String> {
-    let file = File::open("assets/font-awesome/icons.json").ok()?;
-    let reader = BufReader::new(file);
+static ICONS_INIT: Once = Once::new();
+static ICONS_FILE_DATA: &str = include_str!("../assets/font-awesome/icons-light.json");
+static mut ICONS_DATA: Option<Mutex<Vec<IconData>>> = None;
 
-    let stream = Deserializer::from_reader(reader).into_iter::<HashMap<String, IconData>>();
+fn get_icons_data() -> &'static Mutex<Vec<IconData>> {
+    unsafe {
+        ICONS_INIT.call_once(|| {
+            let data: Vec<IconData> =
+                serde_json::from_str(ICONS_FILE_DATA).expect("Failed to parse JSON");
+            ICONS_DATA = Some(Mutex::new(data));
+        });
+
+        ICONS_DATA
+            .as_ref()
+            .expect("ICONS_DATA should be initialized")
+    }
+}
+
+fn get_icon_unicode(label: &str, font: &IconFont) -> Option<String> {
+    let icons_data = get_icons_data().lock().unwrap();
 
     let style = match font {
         IconFont::Brands => "brands".to_owned(),
@@ -185,19 +197,14 @@ fn get_icon_unicode(label: &str, font: &IconFont) -> Option<String> {
         IconFont::Solid => "solid".to_owned(),
     };
 
-    for item in stream {
-        let value = item.ok()?;
+    let icon = icons_data
+        .binary_search_by_key(&label.to_owned(), |item| item.label.clone())
+        .ok()
+        .map(|index| icons_data.get(index))??;
 
-        if value.contains_key(label) {
-            let data = value.get(label)?;
-
-            if !data.styles.contains(&style) {
-                return None;
-            }
-
-            return Some(data.unicode.clone());
-        }
+    if !icon.styles.contains(&style) {
+        return None;
     }
 
-    None
+    Some(icon.unicode.clone())
 }
