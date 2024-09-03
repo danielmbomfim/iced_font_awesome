@@ -63,7 +63,7 @@ pub struct FaIcon {
 }
 
 impl FaIcon {
-    pub fn new(name: &str, size: f32, font: IconFont) -> Self {
+    pub fn new(name: &str, font: IconFont) -> Self {
         let code = get_icon_unicode(name, &font).unwrap_or("3f".to_owned());
         let code_point = u32::from_str_radix(&code, 16).unwrap();
 
@@ -77,7 +77,7 @@ impl FaIcon {
 
         Self {
             code,
-            size,
+            size: 20.0,
             font,
             color: color!(0, 0, 0),
         }
@@ -88,18 +88,24 @@ impl FaIcon {
 
         self
     }
+
+    pub fn size<T: Into<f32>>(mut self, size: T) -> Self {
+        self.size = size.into();
+
+        self
+    }
 }
 
-pub fn fa_icon(name: &str, size: f32) -> FaIcon {
-    FaIcon::new(name, size, IconFont::Default)
+pub fn fa_icon(name: &str) -> FaIcon {
+    FaIcon::new(name, IconFont::Default)
 }
 
-pub fn fa_icon_solid(name: &str, size: f32) -> FaIcon {
-    FaIcon::new(name, size, IconFont::Solid)
+pub fn fa_icon_solid(name: &str) -> FaIcon {
+    FaIcon::new(name, IconFont::Solid)
 }
 
-pub fn fa_icon_brands(name: &str, size: f32) -> FaIcon {
-    FaIcon::new(name, size, IconFont::Brands)
+pub fn fa_icon_brands(name: &str) -> FaIcon {
+    FaIcon::new(name, IconFont::Brands)
 }
 
 impl<Message, Theme, Renderer> Widget<Message, Theme, Renderer> for FaIcon

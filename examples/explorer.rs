@@ -68,7 +68,9 @@ impl Application for Explorer {
                         .fold(content, |content, style| match style.as_str() {
                             "brands" => content.push(
                                 column!(
-                                    fa_icon_brands(&name, 40.0).color(color!(255, 255, 255)),
+                                    fa_icon_brands(&name)
+                                        .size(40.0)
+                                        .color(color!(255, 255, 255)),
                                     text(format!("{}\n({})", name, "brands"))
                                         .horizontal_alignment(Horizontal::Center)
                                 )
@@ -78,7 +80,7 @@ impl Application for Explorer {
                             ),
                             "solid" => content.push(
                                 column!(
-                                    fa_icon_solid(&name, 40.0).color(color!(255, 255, 255)),
+                                    fa_icon_solid(&name).size(40.0).color(color!(255, 255, 255)),
                                     text(format!("{}\n({})", name, "solid"))
                                         .horizontal_alignment(Horizontal::Center)
                                 )
@@ -89,7 +91,7 @@ impl Application for Explorer {
                             _ => content
                                 .push(
                                     column!(
-                                        fa_icon(&name, 40.0).color(color!(255, 255, 255)),
+                                        fa_icon(&name).size(40.0).color(color!(255, 255, 255)),
                                         text(name).horizontal_alignment(Horizontal::Center)
                                     )
                                     .width(80)
@@ -107,8 +109,12 @@ impl Application for Explorer {
                 text_input("icon's label", &self.search_text)
                     .on_input(Message::SearchTextChange)
                     .on_submit(Message::Search),
-                button(fa_icon_solid("magnifying-glass", 20.0).color(color!(255, 255, 255)))
-                    .on_press(Message::Search)
+                button(
+                    fa_icon_solid("magnifying-glass")
+                        .size(20.0)
+                        .color(color!(255, 255, 255))
+                )
+                .on_press(Message::Search)
             )
             .align_items(iced::Alignment::Center)
             .spacing(10),
