@@ -15,8 +15,8 @@ Add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-iced = "0.12"
-iced_font_awesome = "0.1"
+iced = "^0.13"
+iced_font_awesome = "0.2.0"
 ```
 
 ### Usage
@@ -24,28 +24,23 @@ iced_font_awesome = "0.1"
 Here's a basic example of how to use iced_font_awesome:
 
 ```rust
-use iced::{color, widget::row, Sandbox};
+use iced::{color, widget::row, Task};
 use iced_font_awesome::{fa_icon, fa_icon_brands, fa_icon_solid};
+
 fn main() -> iced::Result {
-    Demo::run(iced::Settings::default())
+    iced::application("demo", Demo::update, Demo::view).run_with(Demo::new)
 }
 
 struct Demo {}
 
-impl Sandbox for Demo {
-    type Message = ();
-
-    fn new() -> Self {
-        Self {}
+impl Demo {
+    fn new() -> (Self, Task<()>) {
+        (Self {}, Task::none())
     }
 
-    fn title(&self) -> String {
-        "demo".to_owned()
-    }
+    fn update(&mut self, _message: ()) {}
 
-    fn update(&mut self, _message: Self::Message) {}
-
-    fn view(&self) -> iced::Element<'_, Self::Message> {
+    fn view(&self) -> iced::Element<'_, ()> {
         row!(
             fa_icon("circle-user").size(40.0).color(color!(0, 255, 0)),
             fa_icon_solid("medal")
@@ -53,13 +48,12 @@ impl Sandbox for Demo {
                 .color(color!(249, 170, 51)),
             fa_icon_brands("google").size(60.0)
         )
-        .align_items(iced::Alignment::Center)
+        .align_y(iced::Alignment::Center)
         .padding(10)
         .spacing(10)
         .into()
     }
 }
-
 ```
 
 Result:
@@ -93,3 +87,10 @@ cargo run --example explorer
 ```
 
 This will start the Explorer, allowing you to browse through the icons.
+
+### Map of iced version to required iced_font_awesome version.
+
+| Iced Version | Required Iced Font Awesome Version |
+| ------------ | ---------------------------------- |
+| 0.12         | 0.1.0                              |
+| 0.13         | 0.2.0                              |
