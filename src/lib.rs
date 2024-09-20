@@ -1,6 +1,7 @@
 use std::borrow::Cow;
 use std::sync::{Mutex, Once};
 
+use iced::advanced::graphics::text::font_system;
 use iced::advanced::layout::{self, Layout};
 use iced::advanced::widget::{self, Widget};
 use iced::advanced::{renderer, Text};
@@ -38,14 +39,13 @@ const BRANDS_FONT: Font = Font {
 
 static INIT: Once = Once::new();
 
-fn load_icon_fonts<T>(renderer: &mut T)
-where
-    T: iced::advanced::text::Renderer,
-{
+fn load_icon_fonts() {
     INIT.call_once(|| {
-        renderer.load_font(Cow::from(REGULAR_FONT_DATA));
-        renderer.load_font(Cow::from(BRANDS_FONT_DATA));
-        renderer.load_font(Cow::from(SOLID_FONT_DATA));
+        let mut font_system = font_system().write().unwrap();
+
+        font_system.load_font(Cow::from(REGULAR_FONT_DATA));
+        font_system.load_font(Cow::from(BRANDS_FONT_DATA));
+        font_system.load_font(Cow::from(SOLID_FONT_DATA));
     });
 }
 
@@ -64,6 +64,7 @@ pub struct FaIcon {
 
 impl FaIcon {
     pub fn new(name: &str, font: IconFont) -> Self {
+        load_icon_fonts();
         let code = get_icon_unicode(name, &font).unwrap_or("3f".to_owned());
         let code_point = u32::from_str_radix(&code, 16).unwrap();
 
@@ -138,10 +139,8 @@ where
         _cursor: mouse::Cursor,
         viewport: &Rectangle,
     ) {
-        load_icon_fonts(renderer);
-
         let text = Text {
-            content: &self.code.to_string(),
+            content: self.code.to_string(),
             bounds: layout.bounds().size(),
             horizontal_alignment: iced::alignment::Horizontal::Center,
             vertical_alignment: iced::alignment::Vertical::Center,
@@ -149,6 +148,7 @@ where
             shaping: Shaping::Basic,
             size: Pixels::from(self.size),
             font: self.font,
+            wrapping: widget::text::Wrapping::None,
         };
 
         renderer.fill_text(

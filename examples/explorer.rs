@@ -1,16 +1,16 @@
 use std::sync::{Mutex, Once};
 
-use iced::alignment::Horizontal;
-use iced::widget::scrollable::{Direction, Properties};
+use iced::widget::scrollable::{Direction, Scrollbar};
 use iced::widget::{button, column, row, text, text_input, Scrollable};
-use iced::{color, Application, Command, Element, Length, Theme};
+use iced::{color, Alignment, Element, Length, Size, Task, Theme};
 use iced_font_awesome::{fa_icon, fa_icon_brands, fa_icon_solid};
 use serde::Deserialize;
 
 pub fn main() -> iced::Result {
-    let mut settings = iced::Settings::default();
-    settings.window.size = iced::Size::new(800.0, 300.0);
-    Explorer::run(settings)
+    iced::application("Explorer", Explorer::update, Explorer::view)
+        .window_size(Size::new(800.0, 300.0))
+        .theme(Explorer::theme)
+        .run_with(Explorer::new)
 }
 
 #[derive(Debug, Clone)]
@@ -24,40 +24,31 @@ struct Explorer {
     labels: Option<Vec<(String, IconData)>>,
 }
 
-impl Application for Explorer {
-    type Message = Message;
-    type Executor = iced::executor::Default;
-    type Theme = Theme;
-    type Flags = ();
-
-    fn new(_falgs: Self::Flags) -> (Self, Command<Message>) {
+impl Explorer {
+    fn new() -> (Self, Task<Message>) {
         (
             Explorer {
                 search_text: "".to_owned(),
                 labels: None,
             },
-            Command::none(),
+            Task::none(),
         )
     }
 
-    fn theme(&self) -> Self::Theme {
+    fn theme(&self) -> Theme {
         Theme::Dark.clone()
     }
 
-    fn title(&self) -> String {
-        "Explorer".to_owned()
-    }
-
-    fn update(&mut self, message: Self::Message) -> Command<Message> {
+    fn update(&mut self, message: Message) -> Task<Message> {
         match message {
             Message::SearchTextChange(value) => self.search_text = value,
             Message::Search => self.labels = get_icons(&self.search_text),
         };
 
-        Command::none()
+        Task::none()
     }
 
-    fn view(&self) -> Element<Self::Message> {
+    fn view(&self) -> Element<Message> {
         let mut content = row!().padding(10).spacing(20).width(Length::Shrink);
 
         match self.labels.as_ref() {
@@ -71,33 +62,30 @@ impl Application for Explorer {
                                     fa_icon_brands(&name)
                                         .size(40.0)
                                         .color(color!(255, 255, 255)),
-                                    text(format!("{}\n({})", name, "brands"))
-                                        .horizontal_alignment(Horizontal::Center)
+                                    text!("{}\n({})", name, "brands").align_x(Alignment::Center)
                                 )
                                 .width(80)
                                 .spacing(5)
-                                .align_items(iced::Alignment::Center),
+                                .align_x(Alignment::Center),
                             ),
                             "solid" => content.push(
                                 column!(
                                     fa_icon_solid(&name).size(40.0).color(color!(255, 255, 255)),
-                                    text(format!("{}\n({})", name, "solid"))
-                                        .horizontal_alignment(Horizontal::Center)
+                                    text!("{}\n({})", name, "solid").align_x(Alignment::Center)
                                 )
                                 .width(80)
                                 .spacing(5)
-                                .align_items(iced::Alignment::Center),
+                                .align_x(Alignment::Center),
                             ),
-                            _ => content
-                                .push(
-                                    column!(
-                                        fa_icon(&name).size(40.0).color(color!(255, 255, 255)),
-                                        text(name).horizontal_alignment(Horizontal::Center)
-                                    )
-                                    .width(80)
-                                    .spacing(5),
+                            _ => content.push(
+                                column!(
+                                    fa_icon(&name).size(40.0).color(color!(255, 255, 255)),
+                                    text!("{}", name).align_x(Alignment::Center)
                                 )
-                                .align_items(iced::Alignment::Center),
+                                .align_x(Alignment::Center)
+                                .width(80)
+                                .spacing(5),
+                            ),
                         })
                 });
             }
@@ -116,10 +104,10 @@ impl Application for Explorer {
                 )
                 .on_press(Message::Search)
             )
-            .align_items(iced::Alignment::Center)
+            .align_y(Alignment::Center)
             .spacing(10),
             Scrollable::new(content)
-                .direction(Direction::Horizontal(Properties::default()))
+                .direction(Direction::Horizontal(Scrollbar::default()))
                 .height(Length::Fill)
         )
         .padding(10)
