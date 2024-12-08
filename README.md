@@ -1,4 +1,7 @@
 # Iced Font Awesome
+[![Crates.io](https://img.shields.io/crates/v/iced_font_awesome?style=flat-square)](https://crates.io/crates/iced_font_awesome)
+[![Crates.io](https://img.shields.io/crates/d/iced_font_awesome?style=flat-square)](https://crates.io/crates/iced_font_awesome)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE-MIT)
 
 `iced_font_awesome` is a simple and efficient widget for displaying Font Awesome icons in your [Iced](https://github.com/iced-rs/iced) applications. Customize the size and color of your icons effortlessly.
 
