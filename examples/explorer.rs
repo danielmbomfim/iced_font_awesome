@@ -132,6 +132,7 @@ static INIT: Once = Once::new();
 static ICONS_FILE_DATA: &str = include_str!("../assets/font-awesome/icons-light.json");
 static mut ICONS_DATA: Option<Mutex<Vec<IconData>>> = None;
 
+#[allow(static_mut_refs)]
 fn get_icons_data() -> &'static Mutex<Vec<IconData>> {
     unsafe {
         INIT.call_once(|| {

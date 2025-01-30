@@ -6,10 +6,10 @@ use iced::advanced::layout::{self, Layout};
 use iced::advanced::widget::{self, Widget};
 use iced::advanced::{renderer, Text};
 use iced::font::Family;
-use iced::widget::text::{LineHeight, Shaping};
-use iced::{color, Font, Pixels};
+use iced::widget::text::{Catalog, LineHeight, Shaping, Style, StyleFn};
 use iced::{mouse, Point};
 use iced::{Color, Element, Length, Rectangle, Size};
+use iced::{Font, Pixels};
 use serde::Deserialize;
 
 const REGULAR_FONT_DATA: &[u8] =
@@ -55,14 +55,15 @@ pub enum IconFont {
     Brands,
 }
 
-pub struct FaIcon {
+pub struct FaIcon<'a, Theme: Catalog> {
     code: char,
     size: f32,
-    color: Color,
+    color: Option<Color>,
     font: Font,
+    class: Theme::Class<'a>,
 }
 
-impl FaIcon {
+impl<'a, Theme: Catalog> FaIcon<'a, Theme> {
     pub fn new(name: &str, font: IconFont) -> Self {
         load_icon_fonts();
         let code = get_icon_unicode(name, &font).unwrap_or("3f".to_owned());
@@ -80,12 +81,13 @@ impl FaIcon {
             code,
             size: 20.0,
             font,
-            color: color!(0, 0, 0),
+            color: None,
+            class: Theme::default(),
         }
     }
 
     pub fn color(mut self, color: Color) -> Self {
-        self.color = color;
+        self.color = Some(color);
 
         self
     }
@@ -95,23 +97,37 @@ impl FaIcon {
 
         self
     }
+
+    pub fn style(mut self, style: impl Fn(&Theme) -> Style + 'a) -> Self
+    where
+        Theme::Class<'a>: From<StyleFn<'a, Theme>>,
+    {
+        self.class = (Box::new(style) as StyleFn<'a, Theme>).into();
+        self
+    }
+
+    pub fn class(mut self, class: impl Into<Theme::Class<'a>>) -> Self {
+        self.class = class.into();
+        self
+    }
 }
 
-pub fn fa_icon(name: &str) -> FaIcon {
+pub fn fa_icon<'a, Theme: Catalog>(name: &str) -> FaIcon<'a, Theme> {
     FaIcon::new(name, IconFont::Default)
 }
 
-pub fn fa_icon_solid(name: &str) -> FaIcon {
+pub fn fa_icon_solid<'a, Theme: Catalog>(name: &str) -> FaIcon<'a, Theme> {
     FaIcon::new(name, IconFont::Solid)
 }
 
-pub fn fa_icon_brands(name: &str) -> FaIcon {
+pub fn fa_icon_brands<'a, Theme: Catalog>(name: &str) -> FaIcon<'a, Theme> {
     FaIcon::new(name, IconFont::Brands)
 }
 
-impl<Message, Theme, Renderer> Widget<Message, Theme, Renderer> for FaIcon
+impl<'a, Message, Theme, Renderer> Widget<Message, Theme, Renderer> for FaIcon<'a, Theme>
 where
     Renderer: iced::advanced::text::Renderer<Font = Font>,
+    Theme: Catalog,
 {
     fn size(&self) -> Size<Length> {
         Size {
@@ -133,12 +149,14 @@ where
         &self,
         _state: &widget::Tree,
         renderer: &mut Renderer,
-        _theme: &Theme,
+        theme: &Theme,
         _style: &renderer::Style,
         layout: Layout<'_>,
         _cursor: mouse::Cursor,
         viewport: &Rectangle,
     ) {
+        let style = theme.style(&self.class);
+
         let text = Text {
             content: self.code.to_string(),
             bounds: layout.bounds().size(),
@@ -154,17 +172,18 @@ where
         renderer.fill_text(
             text,
             Point::new(layout.bounds().center_x(), layout.bounds().center_y()),
-            self.color,
+            self.color.unwrap_or(style.color.unwrap_or(Color::WHITE)),
             *viewport,
         );
     }
 }
 
-impl<'a, Message, Theme, Renderer> From<FaIcon> for Element<'a, Message, Theme, Renderer>
+impl<'a, Message, Theme, Renderer> From<FaIcon<'a, Theme>> for Element<'a, Message, Theme, Renderer>
 where
     Renderer: iced::advanced::text::Renderer<Font = Font>,
+    Theme: Catalog + 'a,
 {
-    fn from(icon: FaIcon) -> Self {
+    fn from(icon: FaIcon<'a, Theme>) -> Self {
         Self::new(icon)
     }
 }
@@ -180,6 +199,7 @@ static ICONS_INIT: Once = Once::new();
 static ICONS_FILE_DATA: &str = include_str!("../assets/font-awesome/icons-light.json");
 static mut ICONS_DATA: Option<Mutex<Vec<IconData>>> = None;
 
+#[allow(static_mut_refs)]
 fn get_icons_data() -> &'static Mutex<Vec<IconData>> {
     unsafe {
         ICONS_INIT.call_once(|| {
