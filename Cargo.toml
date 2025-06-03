@@ -15,6 +15,7 @@ license = "MIT"
 path = "src/lib.rs"
 
 [dependencies]
-iced = { version = "^0.13", features = ["advanced"] }
-serde = { version = "1.0.209", features = ["derive"] }
-serde_json = "1.0.127"
+getrandom = { version = "0.3" }
+iced = { git = "https://github.com/iced-rs/iced.git", features = ["advanced"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

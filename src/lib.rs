@@ -160,8 +160,8 @@ where
         let text = Text {
             content: self.code.to_string(),
             bounds: layout.bounds().size(),
-            horizontal_alignment: iced::alignment::Horizontal::Center,
-            vertical_alignment: iced::alignment::Vertical::Center,
+            align_x: iced::alignment::Horizontal::Center.into(),
+            align_y: iced::alignment::Vertical::Center,
             line_height: LineHeight::Relative(self.size),
             shaping: Shaping::Basic,
             size: Pixels::from(self.size),

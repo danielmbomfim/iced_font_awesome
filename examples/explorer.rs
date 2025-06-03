@@ -7,10 +7,10 @@ use iced_font_awesome::{fa_icon, fa_icon_brands, fa_icon_solid};
 use serde::Deserialize;
 
 pub fn main() -> iced::Result {
-    iced::application("Explorer", Explorer::update, Explorer::view)
+    iced::application(Explorer::default, Explorer::update, Explorer::view)
         .window_size(Size::new(800.0, 300.0))
         .theme(Explorer::theme)
-        .run_with(Explorer::new)
+        .run()
 }
 
 #[derive(Debug, Clone)]
@@ -19,22 +19,13 @@ enum Message {
     SearchTextChange(String),
 }
 
+#[derive(Default)]
 struct Explorer {
     search_text: String,
     labels: Option<Vec<(String, IconData)>>,
 }
 
 impl Explorer {
-    fn new() -> (Self, Task<Message>) {
-        (
-            Explorer {
-                search_text: "".to_owned(),
-                labels: None,
-            },
-            Task::none(),
-        )
-    }
-
     fn theme(&self) -> Theme {
         Theme::Dark.clone()
     }
