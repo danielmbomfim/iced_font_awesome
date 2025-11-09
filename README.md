@@ -19,7 +19,7 @@ Add the following to your `Cargo.toml`:
 ```toml
 [dependencies]
 iced = "^0.13"
-iced_font_awesome = "0.2.0"
+iced_font_awesome = "0.3.0"
 ```
 
 ### Usage
@@ -72,7 +72,7 @@ Result:
 
 The Icons Explorer is a handy tool to browse and experiment with all available Font Awesome icons.
 
-![Captura de imagem_20240903_201952](https://github.com/user-attachments/assets/c8df48d6-ed91-4eb7-82e3-b5e2673c215c)
+<img width="1114" height="906" alt="image" src="https://github.com/user-attachments/assets/45009b61-90e0-44fa-b702-e65f6196b133" />
 
 To run the Icons Explorer example, follow these steps:
 
@@ -90,6 +90,13 @@ cargo run --example explorer
 ```
 
 This will start the Explorer, allowing you to browse through the icons.
+
+### Font Awesome versions
+
+This library defaults to Font Awesome 7. To use Font Awesome 6, enable the v6 feature and import the icons as follows:
+```rust
+use iced_font_awesome::v6::{fa_icon, fa_icon_brands, fa_icon_solid};
+```
 
 ### Map of iced version to required iced_font_awesome version.
 
