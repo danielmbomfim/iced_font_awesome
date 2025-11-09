@@ -18,3 +18,8 @@ path = "src/lib.rs"
 iced = { version = "^0.13", features = ["advanced"] }
 serde = { version = "1.0.209", features = ["derive"] }
 serde_json = "1.0.127"
+
+[features]
+default = ["v7"]
+v6 = []
+v7 = []
