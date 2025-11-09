@@ -2,13 +2,12 @@ use std::sync::{Mutex, Once};
 
 use iced::widget::scrollable::{Direction, Scrollbar};
 use iced::widget::{button, column, row, text, text_input, Scrollable};
-use iced::{color, Alignment, Element, Length, Size, Task, Theme};
+use iced::{color, Alignment, Element, Length, Task, Theme};
 use iced_font_awesome::{fa_icon, fa_icon_brands, fa_icon_solid};
 use serde::Deserialize;
 
 pub fn main() -> iced::Result {
     iced::application("Explorer", Explorer::update, Explorer::view)
-        .window_size(Size::new(800.0, 300.0))
         .theme(Explorer::theme)
         .run_with(Explorer::new)
 }
@@ -48,8 +47,8 @@ impl Explorer {
         Task::none()
     }
 
-    fn view(&self) -> Element<Message> {
-        let mut content = row!().padding(10).spacing(20).width(Length::Shrink);
+    fn view<'a>(&'a self) -> Element<'a, Message> {
+        let mut content = row!().padding(10).spacing(20).width(Length::Fill);
 
         match self.labels.as_ref() {
             Some(labels) => {
@@ -106,9 +105,9 @@ impl Explorer {
             )
             .align_y(Alignment::Center)
             .spacing(10),
-            Scrollable::new(content)
-                .direction(Direction::Horizontal(Scrollbar::default()))
-                .height(Length::Fill)
+            Scrollable::new(content.wrap())
+                .direction(Direction::Vertical(Scrollbar::default()))
+                .width(Length::Fill)
         )
         .padding(10)
         .spacing(10)
@@ -129,7 +128,7 @@ struct SearchTerms {
 }
 
 static INIT: Once = Once::new();
-static ICONS_FILE_DATA: &str = include_str!("../assets/font-awesome/icons-light.json");
+static ICONS_FILE_DATA: &str = include_str!("../assets/font-awesome-7/icons-light.json");
 static mut ICONS_DATA: Option<Mutex<Vec<IconData>>> = None;
 
 #[allow(static_mut_refs)]
