@@ -73,7 +73,7 @@ Result:
 
 The Icons Explorer is a handy tool to browse and experiment with all available Font Awesome icons.
 
-<img width="1114" height="906" alt="image" src="https://github.com/user-attachments/assets/45009b61-90e0-44fa-b702-e65f6196b133" />
+![captura de imagem](https://github.com/user-attachments/assets/45009b61-90e0-44fa-b702-e65f6196b133)
 
 To run the Icons Explorer example, follow these steps:
 
