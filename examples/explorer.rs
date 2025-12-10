@@ -7,9 +7,9 @@ use iced_font_awesome::{fa_icon, fa_icon_brands, fa_icon_solid};
 use serde::Deserialize;
 
 pub fn main() -> iced::Result {
-    iced::application("Explorer", Explorer::update, Explorer::view)
+    iced::application(Explorer::new, Explorer::update, Explorer::view)
         .theme(Explorer::theme)
-        .run_with(Explorer::new)
+        .run()
 }
 
 #[derive(Debug, Clone)]

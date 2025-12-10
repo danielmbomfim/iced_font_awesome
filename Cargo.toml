@@ -7,7 +7,7 @@ keywords = ["gui", "iced", "icons"]
 categories = ["gui"]
 readme = "README.md"
 authors = ["Daniel M. Bomfim"]
-version = "0.2.1"
+version = "0.3.0"
 edition = "2021"
 license = "MIT"
 
@@ -15,7 +15,7 @@ license = "MIT"
 path = "src/lib.rs"
 
 [dependencies]
-iced = { version = "^0.13", features = ["advanced"] }
+iced = { version = "^0.14", features = ["advanced"] }
 serde = { version = "1.0.209", features = ["derive"] }
 serde_json = "1.0.127"
 

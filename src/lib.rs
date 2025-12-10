@@ -112,7 +112,7 @@ where
     }
 
     fn layout(
-        &self,
+        &mut self,
         _tree: &mut widget::Tree,
         _renderer: &Renderer,
         _limits: &layout::Limits,
@@ -135,8 +135,8 @@ where
         let text = Text {
             content: self.code.to_string(),
             bounds: layout.bounds().size(),
-            horizontal_alignment: iced::alignment::Horizontal::Center,
-            vertical_alignment: iced::alignment::Vertical::Center,
+            align_x: widget::text::Alignment::Center,
+            align_y: iced::alignment::Vertical::Center,
             line_height: LineHeight::Relative(self.size),
             shaping: Shaping::Basic,
             size: Pixels::from(self.size),

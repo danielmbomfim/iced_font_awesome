@@ -1,4 +1,5 @@
 # Iced Font Awesome
+
 [![Crates.io](https://img.shields.io/crates/v/iced_font_awesome?style=flat-square)](https://crates.io/crates/iced_font_awesome)
 [![Crates.io](https://img.shields.io/crates/d/iced_font_awesome?style=flat-square)](https://crates.io/crates/iced_font_awesome)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE-MIT)
@@ -18,8 +19,8 @@ Add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-iced = "^0.13"
-iced_font_awesome = "0.3.0"
+iced = "^0.14"
+iced_font_awesome = "0.4.0"
 ```
 
 ### Usage
@@ -31,7 +32,7 @@ use iced::{color, widget::row, Task};
 use iced_font_awesome::{fa_icon, fa_icon_brands, fa_icon_solid};
 
 fn main() -> iced::Result {
-    iced::application("demo", Demo::update, Demo::view).run_with(Demo::new)
+    iced::application(Demo::new, Demo::update, Demo::view).run()
 }
 
 struct Demo {}
@@ -72,7 +73,7 @@ Result:
 
 The Icons Explorer is a handy tool to browse and experiment with all available Font Awesome icons.
 
-<img width="1114" height="906" alt="image" src="https://github.com/user-attachments/assets/45009b61-90e0-44fa-b702-e65f6196b133" />
+![captura de imagem](https://github.com/user-attachments/assets/45009b61-90e0-44fa-b702-e65f6196b133)
 
 To run the Icons Explorer example, follow these steps:
 
@@ -94,6 +95,7 @@ This will start the Explorer, allowing you to browse through the icons.
 ### Font Awesome versions
 
 This library defaults to Font Awesome 7. To use Font Awesome 6, enable the v6 feature and import the icons as follows:
+
 ```rust
 use iced_font_awesome::v6::{fa_icon, fa_icon_brands, fa_icon_solid};
 ```
@@ -104,3 +106,4 @@ use iced_font_awesome::v6::{fa_icon, fa_icon_brands, fa_icon_solid};
 | ------------ | ---------------------------------- |
 | 0.12         | 0.1.0                              |
 | 0.13         | 0.2.0                              |
+| 0.14         | 0.4.0                              |
