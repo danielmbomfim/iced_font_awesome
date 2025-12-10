@@ -12,6 +12,8 @@ pub use crate::fonts::v6;
 #[cfg(feature = "v7")]
 pub use crate::fonts::v7::{fa_icon, fa_icon_brands, fa_icon_solid, FaIcon};
 
+pub use fonts::IconFont;
+
 mod fonts {
     use std::{
         borrow::Cow,
