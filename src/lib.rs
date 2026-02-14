@@ -127,12 +127,12 @@ where
         _state: &widget::Tree,
         renderer: &mut Renderer,
         theme: &Theme,
-        _style: &renderer::Style,
+        style: &renderer::Style,
         layout: Layout<'_>,
         _cursor: mouse::Cursor,
         viewport: &Rectangle,
     ) {
-        let style = theme.style(&self.class);
+        let appearance = theme.style(&self.class);
 
         let text = Text {
             content: self.code.to_string(),
@@ -149,7 +149,7 @@ where
         renderer.fill_text(
             text,
             Point::new(layout.bounds().center_x(), layout.bounds().center_y()),
-            self.color.unwrap_or(style.color.unwrap_or(Color::WHITE)),
+            self.color.unwrap_or(appearance.color.unwrap_or(style.text_color)),
             *viewport,
         );
     }
