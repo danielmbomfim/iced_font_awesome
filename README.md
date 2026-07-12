@@ -94,7 +94,7 @@ This will start the Explorer, allowing you to browse through the icons.
 
 ### Font Awesome versions
 
-This library defaults to Font Awesome 7. To use Font Awesome 6, enable the v6 feature and import the icons as follows:
+This library defaults to Font Awesome 7.3. To use Font Awesome 6, enable the v6 feature and import the icons as follows:
 
 ```rust
 use iced_font_awesome::v6::{fa_icon, fa_icon_brands, fa_icon_solid};
