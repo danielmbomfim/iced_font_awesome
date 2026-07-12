@@ -53,16 +53,32 @@ pub(crate) fn get_icon_unicode(label: &str, font: &IconFont) -> Option<String> {
         IconFont::Solid => "solid".to_owned(),
     };
 
-    let icon = icons_data
-        .binary_search_by_key(&label.to_owned(), |item| item.label.clone())
-        .ok()
-        .map(|index| icons_data.get(index))??;
+    let icon = icons_data.iter().find(|item| {
+        item.label == label || normalize_label(&item.label) == normalize_label(label)
+    })?;
 
     if !icon.styles.contains(&style) {
         return None;
     }
 
     Some(icon.unicode.clone())
+}
+
+fn normalize_label(label: &str) -> String {
+    label
+        .chars()
+        .map(|character| {
+            if character.is_ascii_alphanumeric() {
+                character.to_ascii_lowercase()
+            } else {
+                '-'
+            }
+        })
+        .collect::<String>()
+        .split('-')
+        .filter(|part| !part.is_empty())
+        .collect::<Vec<_>>()
+        .join("-")
 }
 
 pub struct FaIcon;
