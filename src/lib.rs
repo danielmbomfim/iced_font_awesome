@@ -15,10 +15,7 @@ pub use crate::fonts::v7::{fa_icon, fa_icon_brands, fa_icon_solid, FaIcon};
 pub use fonts::IconFont;
 
 mod fonts {
-    use std::{
-        borrow::Cow,
-        sync::{Mutex, Once},
-    };
+    use std::{borrow::Cow, collections::HashMap, sync::Once};
 
     #[cfg(feature = "v6")]
     pub mod v6;
@@ -58,11 +55,111 @@ mod fonts {
         Brands,
     }
 
-    #[derive(Deserialize, Clone)]
+    #[derive(Default)]
+    struct IconIndex {
+        regular: HashMap<String, char>,
+        solid: HashMap<String, char>,
+        brands: HashMap<String, char>,
+    }
+
+    impl IconIndex {
+        fn from_json(json: &str) -> Self {
+            let icons: Vec<IconData> =
+                serde_json::from_str(json).expect("Failed to parse icon metadata JSON");
+            let mut index = Self::default();
+
+            for icon in icons {
+                let code_point = u32::from_str_radix(&icon.unicode, 16)
+                    .expect("Icon metadata should contain a hexadecimal code point");
+                let code = char::from_u32(code_point)
+                    .expect("Icon metadata should contain a valid Unicode code point");
+                let normalized_label = normalize_label(&icon.label);
+
+                for style in icon.styles {
+                    let icons = match style.as_str() {
+                        "brands" => &mut index.brands,
+                        "regular" => &mut index.regular,
+                        "solid" => &mut index.solid,
+                        _ => continue,
+                    };
+
+                    // Canonical names are already normalized, so the common lookup
+                    // path is a borrowed hash lookup with no allocation.
+                    icons.entry(normalized_label.clone()).or_insert(code);
+                }
+            }
+
+            index
+        }
+
+        fn get(&self, label: &str, font: &IconFont) -> Option<char> {
+            let icons = match font {
+                IconFont::Brands => &self.brands,
+                IconFont::Default => &self.regular,
+                IconFont::Solid => &self.solid,
+            };
+
+            icons.get(label).copied().or_else(|| {
+                let normalized_label = normalize_label(label);
+                icons.get(&normalized_label).copied()
+            })
+        }
+    }
+
+    fn normalize_label(label: &str) -> String {
+        let mut normalized = String::with_capacity(label.len());
+        let mut separator_pending = false;
+
+        for character in label.chars() {
+            if character.is_ascii_alphanumeric() {
+                if separator_pending && !normalized.is_empty() {
+                    normalized.push('-');
+                }
+                normalized.push(character.to_ascii_lowercase());
+                separator_pending = false;
+            } else if !normalized.is_empty() {
+                separator_pending = true;
+            }
+        }
+
+        normalized
+    }
+
+    #[derive(Deserialize)]
     struct IconData {
         label: String,
         unicode: String,
         styles: Vec<String>,
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+
+        const ICONS: &str = r#"[
+            {"label":"Circle User","unicode":"f2bd","styles":["regular","solid"]},
+            {"label":"GitHub","unicode":"f09b","styles":["brands"]}
+        ]"#;
+
+        #[test]
+        fn icon_index_resolves_canonical_and_flexible_labels() {
+            let index = IconIndex::from_json(ICONS);
+
+            assert_eq!(index.get("circle-user", &IconFont::Solid), Some('\u{f2bd}'));
+            assert_eq!(
+                index.get(" Circle__USER ", &IconFont::Default),
+                Some('\u{f2bd}')
+            );
+            assert_eq!(index.get("github", &IconFont::Brands), Some('\u{f09b}'));
+        }
+
+        #[test]
+        fn icon_index_is_scoped_by_style() {
+            let index = IconIndex::from_json(ICONS);
+
+            assert_eq!(index.get("github", &IconFont::Solid), None);
+            assert_eq!(index.get("circle-user", &IconFont::Brands), None);
+        }
     }
 }
 
@@ -149,7 +246,8 @@ where
         renderer.fill_text(
             text,
             Point::new(layout.bounds().center_x(), layout.bounds().center_y()),
-            self.color.unwrap_or(appearance.color.unwrap_or(style.text_color)),
+            self.color
+                .unwrap_or(appearance.color.unwrap_or(style.text_color)),
             *viewport,
         );
     }
