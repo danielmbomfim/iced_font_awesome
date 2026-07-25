@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Update the embedded Font Awesome 7 assets to 7.3.0.
+
 ## [0.4.2](https://github.com/danielmbomfim/iced_font_awesome/compare/v0.4.1...v0.4.2) - 2026-02-14
 
 ### Other
