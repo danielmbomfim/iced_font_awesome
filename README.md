@@ -20,7 +20,7 @@ Add the following to your `Cargo.toml`:
 ```toml
 [dependencies]
 iced = "^0.14"
-iced_font_awesome = "0.4.0"
+iced_font_awesome = "0.4.4"
 ```
 
 ### Usage
