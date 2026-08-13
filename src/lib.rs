@@ -1,10 +1,11 @@
-use iced::advanced::layout::{self, Layout};
-use iced::advanced::widget::{self, Widget};
-use iced::advanced::{renderer, Text};
-use iced::widget::text::{Catalog, LineHeight, Shaping, Style, StyleFn};
-use iced::{mouse, Point};
-use iced::{Color, Element, Length, Rectangle, Size};
-use iced::{Font, Pixels};
+use iced_core::layout::{self, Layout};
+use iced_core::text::{LineHeight, Shaping};
+use iced_core::widget::text::{Catalog, Style, StyleFn};
+use iced_core::widget::{self, Widget};
+use iced_core::{mouse, Point};
+use iced_core::{renderer, Text};
+use iced_core::{Color, Element, Length, Rectangle, Size};
+use iced_core::{Font, Pixels};
 
 #[cfg(feature = "v6")]
 pub use crate::fonts::v6;
@@ -22,8 +23,8 @@ mod fonts {
     #[cfg(feature = "v7")]
     pub mod v7;
 
-    use iced::widget::text::Catalog;
-    use iced::{advanced::graphics::text::font_system, font::Family, Font};
+    use iced_core::{font::Family, Font};
+    use iced_graphics::text::font_system;
     use serde::Deserialize;
 
     use crate::Icon;
@@ -200,7 +201,7 @@ impl<'a, Theme: Catalog> Icon<'a, Theme> {
 
 impl<'a, Message, Theme, Renderer> Widget<Message, Theme, Renderer> for Icon<'a, Theme>
 where
-    Renderer: iced::advanced::text::Renderer<Font = Font>,
+    Renderer: iced_core::text::Renderer<Font = Font>,
     Theme: Catalog,
 {
     fn size(&self) -> Size<Length> {
@@ -235,7 +236,7 @@ where
             content: self.code.to_string(),
             bounds: layout.bounds().size(),
             align_x: widget::text::Alignment::Center,
-            align_y: iced::alignment::Vertical::Center,
+            align_y: iced_core::alignment::Vertical::Center,
             line_height: LineHeight::Relative(self.size),
             shaping: Shaping::Basic,
             size: Pixels::from(self.size),
@@ -255,7 +256,7 @@ where
 
 impl<'a, Message, Theme, Renderer> From<Icon<'a, Theme>> for Element<'a, Message, Theme, Renderer>
 where
-    Renderer: iced::advanced::text::Renderer<Font = Font>,
+    Renderer: iced_core::text::Renderer<Font = Font>,
     Theme: Catalog + 'a,
 {
     fn from(icon: Icon<'a, Theme>) -> Self {

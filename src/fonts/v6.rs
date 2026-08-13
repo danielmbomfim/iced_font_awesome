@@ -1,4 +1,5 @@
 use super::*;
+use iced_core::widget::text::Catalog;
 use std::sync::OnceLock;
 
 pub(crate) const REGULAR_FONT_DATA: &[u8] =
@@ -17,7 +18,7 @@ pub(crate) const REGULAR_FONT: Font = Font {
 
 pub(crate) const SOLID_FONT: Font = Font {
     family: Family::Name("Font Awesome 6 Free"),
-    weight: iced::font::Weight::Black,
+    weight: iced_core::font::Weight::Black,
     ..Font::DEFAULT
 };
 
